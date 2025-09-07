@@ -1,51 +1,70 @@
 
+let SPRITESHEET;
+
+let sprites = {
+    background: null,
+    wall: null,
+    start: null,
+    end: null,
+    player: null,
+    edit: null
+}
+
+function preload() {
+    SPRITESHEET = loadImage("../assets/spritesheet.png");
+}
+
 function setup() {
     createCanvas(maze.gridSize * maze.rows + maze.gridSize * 2, maze.gridSize * maze.cols + maze.gridSize * 2, mazeCanvas);
     colorMode(RGB, 255);
-    stroke(128, 128, 128)
+
     strokeWeight(0);
+    noSmooth();
+
     player.pos[0] = maze.start[0];
     player.pos[1] = maze.start[1];
+
+    sprites = {
+        background: SPRITESHEET.get(0, 0, 8, 8),
+        wall: SPRITESHEET.get(8, 0, 8, 8),
+        start: SPRITESHEET.get(16, 0, 8, 8),
+        end: SPRITESHEET.get(24, 0, 8, 8),
+        player: SPRITESHEET.get(32, 0, 8, 8),
+        edit: SPRITESHEET.get(40, 0, 8, 8)
+    }
 }
 
 function draw() {
-    background(0, 0, 0);
+    background(0, 0, 8);
 
-    for (let col = 0; col < maze.map.length; col++) {
-        for (let row = 0; row < maze.map[col].length; row++) {
-            if (maze.map[col][row] == 0) fill(255, 255, 255);
-            else if (maze.map[col][row] == 1) fill(0, 0, 0, 255);
-            square(
-                row * maze.gridSize + maze.gridSize,
-                col * maze.gridSize + maze.gridSize,
-                maze.gridSize
-            );
+    for (let row = 0; row < maze.map.length; row++) {
+        for (let col = 0; col < maze.map[row].length; col++) {
+            if (maze.map[row][col] == 0) {
+                // Background
+                image(sprites.background, col * maze.gridSize + maze.gridSize, row * maze.gridSize + maze.gridSize, maze.gridSize, maze.gridSize);
+            } else if (maze.map[row][col] == 1) {
+                // Wall
+                image(sprites.wall, col * maze.gridSize + maze.gridSize, row * maze.gridSize + maze.gridSize, maze.gridSize, maze.gridSize);
+            }
         }
     }
 
     // Start
-    fill(0, 255, 0);
-    square(
-        maze.start[0] * maze.gridSize + maze.gridSize,
-        maze.start[1] * maze.gridSize + maze.gridSize,
-        maze.gridSize
-    );
+    if (maze.start[0] != null && maze.start[1] != null) {
+        image(sprites.start, maze.start[0] * maze.gridSize + maze.gridSize, maze.start[1] * maze.gridSize + maze.gridSize, maze.gridSize, maze.gridSize);
+    }
 
     // End
-    fill(255, 0, 0);
-    square(
-        maze.end[0] * maze.gridSize + maze.gridSize,
-        maze.end[1] * maze.gridSize + maze.gridSize,
-        maze.gridSize
-    );
+    if (maze.end[0] != null && maze.end[1] != null) {
+        image(sprites.end, maze.end[0] * maze.gridSize + maze.gridSize, maze.end[1] * maze.gridSize + maze.gridSize, maze.gridSize, maze.gridSize);
+    }
 
-    // Player
-    fill(0, 0, 255);
-    square(
-        player.pos[0] * maze.gridSize + maze.gridSize,
-        player.pos[1] * maze.gridSize + maze.gridSize,
-        maze.gridSize
-    );
+    if (!player.edit) {
+        // Player
+        image(sprites.player, player.pos[0] * maze.gridSize + maze.gridSize, player.pos[1] * maze.gridSize + maze.gridSize, maze.gridSize, maze.gridSize);
+    } else {
+        image(sprites.edit, player.pos[0] * maze.gridSize + maze.gridSize, player.pos[1] * maze.gridSize + maze.gridSize, maze.gridSize, maze.gridSize);
+    }
 }
 
 function keyPressed() {
